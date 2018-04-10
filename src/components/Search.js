@@ -33,28 +33,30 @@ class Search extends Component {
       query: FEED_SEARCH_QUERY,
       variables: { filter },
     })
-    const links = result.data.feed.links
+    const links = result.data.feed
     this.setState({ links })
   }
 }
 
 const FEED_SEARCH_QUERY = gql`
   query FeedSearchQuery($filter: String!) {
-    feed(filter: $filter) {
-      links {
+    feed(
+      filter: {
+        description_contains: $filter
+      }
+    ) {
+      id
+      url
+      description
+      createdAt
+      postedBy {
         id
-        url
-        description
-        createdAt
-        postedBy {
+        name
+      }
+      votes {
+        id
+        user {
           id
-          name
-        }
-        votes {
-          id
-          user {
-            id
-          }
         }
       }
     }

@@ -51,9 +51,9 @@ class LinkList extends Component {
 
   _getLinksToRender = isNewPage => {
     if (isNewPage) {
-      return this.props.feedQuery.feed.links
+      return this.props.feedQuery.feed
     }
-    const rankedLinks = this.props.feedQuery.feed.links.slice()
+    const rankedLinks = this.props.feedQuery.feed.slice()
     rankedLinks.sort((l1, l2) => l2.votes.length - l1.votes.length)
     return rankedLinks
   }
@@ -85,7 +85,7 @@ class LinkList extends Component {
       variables: { first, skip, orderBy },
     })
 
-    const votedLink = data.feed.links.find(link => link.id === linkId)
+    const votedLink = data.feed.find(link => link.id === linkId)
     votedLink.votes = createVote.link.votes
     store.writeQuery({ query: FEED_QUERY, data })
   }
@@ -117,7 +117,7 @@ class LinkList extends Component {
       updateQuery: (previous, { subscriptionData }) => {
         const newAllLinks = [
           subscriptionData.data.newLink.node,
-          ...previous.feed.links,
+          ...previous.feed,
         ]
         const result = {
           ...previous,
@@ -167,21 +167,18 @@ class LinkList extends Component {
 export const FEED_QUERY = gql`
   query FeedQuery($first: Int, $skip: Int, $orderBy: LinkOrderByInput) {
     feed(first: $first, skip: $skip, orderBy: $orderBy) {
-      count
-      links {
+      id
+      createdAt
+      url
+      description
+      postedBy {
         id
-        createdAt
-        url
-        description
-        postedBy {
+        name
+      }
+      votes {
+        id
+        user {
           id
-          name
-        }
-        votes {
-          id
-          user {
-            id
-          }
         }
       }
     }
